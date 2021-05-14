@@ -8,11 +8,12 @@ export const EventForm = () => {
     const history = useHistory()
 
     const [currentEvent, setEvent] = useState({})
-    const {getGames, games} = useContext(GameContext)
+    const {getGames, games, gamers, getGamers } = useContext(GameContext)
     const {createEvent} = useContext(EventContext)
 
     useEffect(() => {
         getGames()
+        getGamers()
     }, [])
 
     const changeEventState = (domEvent) => {
@@ -20,6 +21,24 @@ export const EventForm = () => {
         copyEvent[domEvent.target.name] = domEvent.target.value
 
         setEvent(copyEvent)
+    }
+
+    const changeGamerState = (event) => {
+        console.log(event.target.value)
+        const copyEvent = {...currentEvent}
+        if (copyEvent.gamers) {
+            // if value is already in array, remove on second click
+            if (copyEvent.gamers.includes(event.target.value)) {
+                // remove the id
+                copyEvent.gamers = copyEvent.gamers.filter(g => g !== event.target.value)
+            } else {
+                copyEvent.gamers.push(event.target.value)
+            }
+        } else {
+            copyEvent.gamers = [event.target.value]
+        }
+        setEvent(copyEvent)
+        console.log(copyEvent)
     }
 
     return (
@@ -35,6 +54,21 @@ export const EventForm = () => {
                         {
                             games.map(game => (
                                 <option key={game.id} value={game.id}>{game.title}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div className="form-group">
+                    <label htmlFor="gamers">Gamers: </label>
+                    <select name="gamers"  multiple
+                        value={currentEvent.gamers}
+                        onChange={ changeGamerState }>
+                        <option value="0">Select Gamers...</option>
+                        {
+                            gamers.map(gamer => (
+                                <option key={gamer.id} value={gamer.id}>{gamer.user?.first_name} {gamer.user?.last_name}</option>
                             ))
                         }
                     </select>
